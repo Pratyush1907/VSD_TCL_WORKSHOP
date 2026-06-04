@@ -1,578 +1,576 @@
 # VSD_TCL_WORKSHOP
-🛠️ TCL Scripting Workshop — VSD VLSI System Design
-<div align="center">
-![TCL](https://img.shields.io/badge/Language-TCL%2FTk-blue?style=for-the-badge&logo=tcl&logoColor=white)
-![Yosys](https://img.shields.io/badge/Tool-Yosys-orange?style=for-the-badge)
-![OpenTimer](https://img.shields.io/badge/STA-OpenTimer-green?style=for-the-badge)
-![Shell](https://img.shields.io/badge/Shell-Bash-black?style=for-the-badge&logo=gnu-bash&logoColor=white)
-![Status](https://img.shields.io/badge/Workshop-Completed-brightgreen?style=for-the-badge)
-A 5-Day Hands-On Workshop on TCL Scripting for VLSI EDA Automation
-Covering CSV parsing → SDC generation → Yosys synthesis → OpenTimer STA → Report generation
-</div>
----
-📋 Table of Contents
-Overview
-Flow Diagram
-Day 1 — Shell Scripting & TCL Setup
-Day 2 — CSV Parsing & Matrix Operations
-Day 3 — SDC Constraint Generation
-Day 4 — Yosys Synthesis & Hierarchy Checking
-Day 5 — OpenTimer STA & Report Generation
-Tools & Technologies
-Key Learnings
----
-🔍 Overview
-This repository documents the 5-Day TCL Scripting Workshop by VSD (VLSI System Design). The workshop builds a complete, automated EDA flow from scratch — taking a design CSV as input and producing timing analysis reports as output, entirely driven by TCL scripts.
-Day	Theme	Core Topics
-Day 1	Shell & TCL Basics	`chmod`, file execution, shell→TCL bridge
-Day 2	CSV Parsing & Matrices	`argv`, `struct::matrix`, string operations
-Day 3	SDC Generation	Clock/IO constraints, bus detection, Verilog parsing
-Day 4	Yosys & Hierarchy Check	Gate-level synthesis, error handling, `exec`
-Day 5	STA & Report Generation	OpenTimer, `proc`, WNS, FEP, instance count
----
-🔄 Flow Diagram
-```
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                      AUTOMATION FLOW                           │
-  │                                                                 │
-  │  [design.csv]  ──►  vsdsynth.sh  ──►  vsdsynth.tcl            │
-  │       │                                     │                  │
-  │       │                          ┌──────────▼───────────┐      │
-  │       │                          │   Parse CSV Matrix   │      │
-  │       │                          │  (struct::matrix)    │      │
-  │       │                          └──────────┬───────────┘      │
-  │       │                                     │                  │
-  │       ▼                          ┌──────────▼───────────┐      │
-  │  [constraints.csv]  ──────────►  │  Generate .sdc file  │      │
-  │                                  │  (clocks, I/O delays)│      │
-  │                                  └──────────┬───────────┘      │
-  │                                             │                  │
-  │  [netlist/*.v]  ──────────────►  ┌──────────▼───────────┐      │
-  │                                  │  Hierarchy Check +   │      │
-  │                                  │  Yosys Synthesis     │      │
-  │                                  └──────────┬───────────┘      │
-  │                                             │                  │
-  │  [.lib, .spef]  ──────────────►  ┌──────────▼───────────┐      │
-  │                                  │  OpenTimer STA       │      │
-  │                                  │  (.conf generation)  │      │
-  │                                  └──────────┬───────────┘      │
-  │                                             │                  │
-  │                                  ┌──────────▼───────────┐      │
-  │                                  │  Final Report        │      │
-  │                                  │  WNS | FEP | Area   │      │
-  │                                  └──────────────────────┘      │
-  └─────────────────────────────────────────────────────────────────┘
-```
----
-📅 Day 1 — Shell Scripting & TCL Setup
-Objective
-Get comfortable with the Linux shell environment, understand file permissions, and set up the bridge between shell scripts and TCL scripts for EDA automation.
----
-1.1 Making Scripts Executable
-Before a script can be run, it must be given execute permission using `chmod`:
-```bash
-chmod +x filename    # grant execute permission
-./filename           # run the script
-```
-> **Why `./`?**  
-> In Linux, the current directory is not in `PATH` by default (for security). The `./` prefix explicitly tells the shell to look in the current directory.
----
-1.2 Shell → TCL Bridge
-In EDA flows, a Bash script acts as the entry point: it validates inputs and then calls the TCL interpreter with the actual logic script.
-`vsdsynth` (shell script):
-```bash
-#!/bin/bash
+# TCL Scripting for VSD Synthesis Flow
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: ./vsdsynth <design.csv>"
-    exit 1
-fi
+## Overview
 
-tclsh vsdsynth.tcl $1
+This repository documents my **5-day TCL Scripting for VLSI System Design (VSD)** learning journey. During this workshop, I learned how TCL scripting can be used to automate synthesis flows, process CSV constraint files, generate SDC constraints, perform hierarchy checking, handle errors, and automate Yosys-based RTL synthesis.
+
+The project culminates in building a TCL-based synthesis framework (**vsdsynth**) that:
+
+* Reads RTL netlists and design constraints.
+* Validates design files and directories.
+* Converts CSV constraints into SDC format.
+* Generates Yosys synthesis scripts automatically.
+* Performs hierarchy checking and error handling.
+* Produces synthesized gate-level netlists and reports.
+
+*Source: TCL SCRIPTING VSD workshop notes* 
+
+---
+
+# Day 1 – Introduction to TCL-Based Synthesis Flow
+
+## Objectives
+
+* Understanding the VSD synthesis framework.
+* Running executable shell scripts.
+* Understanding the overall synthesis flow.
+
+## Topics Covered
+
+### Making Scripts Executable
+
+```bash
+chmod +x vsdsynth
 ```
-`vsdsynth.tcl` is invoked with the CSV filename as its first argument.
-> Here `vsdsynth` is the shell script and `vsdsynth.tcl` is the TCL script called inside it.  
-> `$argv[1]` corresponds to the only/first file argument.  
-> If a secondary file is passed, it would be `$argv[2]`.
+
+This command grants execution permission to the script.
+
+### Running the Script
+
+```bash
+./vsdsynth
+```
+
+The script launches the TCL-based synthesis environment.
+
+### Understanding the Tool Flow
+
+The synthesis tool:
+
+1. Accepts RTL netlists and SDC constraints.
+2. Uses Yosys as the synthesis engine.
+3. Generates:
+
+   * Synthesized netlists
+   * Timing reports
+   * Output directories
+
+### Error Handling for Missing Input Files
+
+The script checks whether the required CSV file exists before continuing execution.
+
+## Key Learnings
+
+* Linux execution permissions.
+* Shell script invocation.
+* Introduction to automation of synthesis flows.
+* Importance of validating user inputs.
+
+## Screenshots
+
+### Tool Initialization
+
+![Day1-Tool Initialization](images/day1_tool_initialization.png)
+
+### Missing CSV File Detection
+
+![Day1-CSV Error](images/day1_csv_error.png)
+
 ---
-1.3 Key Commands
-Command	Description
-`chmod +x file`	Grant execute permission
-`./filename`	Execute script in current directory
-`tclsh script.tcl`	Invoke TCL interpreter
-`$1`, `$2`	Positional arguments in shell
-`#!/bin/bash`	Shebang — specifies the interpreter
----
-📸 Screenshots — Day 1
-> *Screenshot 1: `chmod +x vsdsynth` — terminal showing `-rwxr-xr-x` permission after the command*
-> *Screenshot 2: `./vsdsynth openmsv.csv` — shell script invoking the TCL interpreter*
-> *Screenshot 3: Contents of `vsdsynth` — shebang, argument validation, and `tclsh` call*
----
-📅 Day 2 — CSV Parsing & Matrix Operations
-Objective
-Learn how to declare TCL variables, read command-line arguments, open and parse CSV files, build matrix data structures, and perform string transformations.
----
-2.1 Variables & Command-Line Arguments
-TCL uses `set` to create variables. Arguments passed from the shell are available via the `argv` list.
+
+# Day 2 – Working with TCL Variables, Arrays and CSV Parsing
+
+## Objectives
+
+* Understanding TCL variables.
+* Reading command-line arguments.
+* Parsing CSV files.
+* Creating matrices and arrays.
+
+## Topics Covered
+
+### Command Line Arguments
+
 ```tcl
-# lindex $argv 0  →  first argument (like $1 in bash)
 set filename [lindex $argv 0]
-
-# For a second file:
-# set filename2 [lindex $argv 1]
 ```
-> `Set variable [lindex $argv 0]` — sets a variable to the value at index 0 of `$argv`, i.e., `$argv[1]` in shell terms.
----
-2.2 Opening & Parsing a CSV File
+
+TCL stores command-line arguments in `$argv`.
+
+| Index   | Meaning     |
+| ------- | ----------- |
+| argv[0] | First file  |
+| argv[1] | Second file |
+| argv[2] | Third file  |
+
+### Reading CSV Files
+
 ```tcl
 package require csv
 package require struct::matrix
 
-# Declare the CSV file as a variable
-set filename "openmsv.csv"
-
-# Open the file in read mode
-set f [open $filename r]
-
-# Create a matrix named 'm'
 struct::matrix m
 
-# Read CSV content into matrix; 'auto' detects rows/columns
-csv::read2matrix $f m , auto
-
-# Convert matrix into array format for easy access
-m link m_arr
+set f [open $filename]
+csv::read2matrix $f m auto
+close $f
 ```
-> **Matrix convention:** TCL matrices use `(column, row)` — not `(row, column)`.  
-> A **2,6 matrix** means **2 columns and 6 rows**.
----
-2.3 Extracting Values from the Matrix
+
+This loads CSV data into a matrix structure.
+
+### Converting Matrix to Array
+
 ```tcl
-set i 0
-
-# m_arr(column, row) — column 0, row 0 gives design name
-set DesignName [m_arr(0,$i)]
-
-# Print to screen
-puts "Design Name: $DesignName"
-# → Design Name: openMSP430
+m link my_arr
 ```
-> Taking an incremental variable `$i` as 0 — `my_arr(0,1)` becomes `my_arr(1)`.  
-> After this, `puts` prints the values to screen.
----
-2.4 String Operations
-`string map` — character/substring replacement:
+
+Allows matrix data to be accessed like an array.
+
+### String Manipulation
+
+#### Removing Spaces
+
 ```tcl
-# Replace _ghosh with _vsd
-set new_name [string map {_ghosh _vsd} $original_name]
-# kunal_ghosh  →  kunal_vsd
+string map {" " ""} $value
+```
 
-# Remove spaces to make a valid variable name
-set CleanName [string map {" " ""} "Design Name"]
-# "Design Name"  →  "DesignName"
-```
-> `string map` is used to convert a given name to another name.  
-> In code, `set string map` removes the space — `"  " ""` — doing concatenation.  
-> So `Design Name` becomes `DesignName`, which can then be used as a variable.
-Using the cleaned name as a variable:
-```tcl
-# Set the variable dynamically
-set $DesignName "openMSP430"
+#### Replacing Strings
 
-# Access it:
-puts $$DesignName
-# → openMSP430
-```
-> Anything inside `[ ]` is a TCL command that gets executed.  
-> To use literal square brackets in output, escape them as `\[` and `\]`.
----
-2.5 Verifying File & Directory Existence
 ```tcl
-# Check directories and files mentioned in the .csv exist
-if {![file isdirectory $NetlistDirectory]} {
-    puts "Error: $NetlistDirectory does not exist."
-    exit 1
-}
-if {![file exists $ConstraintsFile]} {
-    puts "Error: Constraints file not found."
-    exit 1
-}
+string map {_ghosh _vsd} kunal_ghosh
 ```
+
+Output:
+
+```text
+kunal_vsd
+```
+
+### Creating Variables Dynamically
+
+```tcl
+set DesignName $my_arr(1,0)
+```
+
+Now:
+
+```tcl
+puts $DesignName
+```
+
+returns:
+
+```text
+openMSP430
+```
+
+### File and Directory Validation
+
+The script verifies:
+
+* Output directory
+* RTL netlist directory
+* Library files
+* Constraint files
+
+before synthesis begins.
+
+## Key Learnings
+
+* TCL variable declaration.
+* Matrix and array operations.
+* CSV parsing techniques.
+* Dynamic variable creation.
+* Path validation.
+
+## Screenshots
+
+### CSV File Parsing
+
+![Day2-CSV Parsing](images/day2_csv_parsing.png)
+
+### Matrix Creation and Array Linking
+
+![Day2-Matrix](images/day2_matrix_creation.png)
+
+### Directory Validation
+
+![Day2-Directory Check](images/day2_directory_validation.png)
+
 ---
-📸 Screenshots — Day 2
-> *Screenshot 1: `openmsv.csv` — design parameters matrix (design name, netlist dir, constraints file path, etc.)*
-> *Screenshot 2: Terminal showing TCL script reading CSV and printing `DesignName = openMSP430`*
-> *Screenshot 3: `string map` before/after — `Design Name` → `DesignName`*
-> *Screenshot 4: `puts` output of all extracted design parameters from matrix array*
----
-📅 Day 3 — SDC Constraint Generation
-Objective
-Parse the constraints CSV, extract clock/input/output timing parameters, handle multi-bit buses, and write a properly formatted SDC file for synthesis and STA tools.
----
-3.1 What is an SDC File?
-An SDC (Synopsys Design Constraints) file defines timing requirements. Key commands:
-SDC Command	Purpose
-`create_clock`	Define clock signal, period, waveform
-`set_input_delay`	Input signal arrival time relative to clock
-`set_output_delay`	Required output timing
-`set_load`	Capacitive load on output ports
----
-3.2 Reading the Constraints Matrix
+
+# Day 3 – Constraint Processing and SDC Generation
+
+## Objectives
+
+* Converting CSV constraints into SDC.
+* Understanding matrix search operations.
+* Generating timing constraints automatically.
+
+## Topics Covered
+
+### Creating Constraint Matrix
+
 ```tcl
 struct::matrix constraints
-set Chan [open $ConstraintsFile r]
 
-# Used to detect rows and columns automatically
-csv::read2matrix $Chan constraints , auto
-
-# Find where each section starts
-# e.g., clock is at row 0, input port at row 4, output at row 27
-set clock_start  [lindex [constraints search all "clock"]  1]
-set input_start  [lindex [constraints search all "input"]  1]
-set output_start [lindex [constraints search all "output"] 1]
+set chan [open $ConstraintsFile]
+csv::read2matrix $chan constraints auto
+close $chan
 ```
-> This constraint search searches between `(0,0)` and `(10,3)` (column, row).  
-> Returns `{3 0}` — meaning `early_rise_delay` is at column 3, row 0.  
-> Hence `clock_early_rise_delay_start` is set to **3**.
----
-3.3 Generating Clock Constraints
+
+### Locating Constraint Parameters
+
+Example:
+
 ```tcl
-# Open SDC file in write mode ("w")
-set sdc_file [open $OutputDir/$DesignName.sdc w]
-
-set i $clock_start
-while {$i < $input_start} {
-    set clock_name   [constraints get cell 0 $i]
-    set clock_period [constraints get cell $clock_period_start $i]
-    set duty_cycle   [constraints get cell $clock_duty_cycle_start $i]
-
-    # Calculate high time for waveform
-    set high_time [expr {$clock_period * $duty_cycle / 100.0}]
-
-    # constraint get cell $variable $i → value at (column, row)
-    # e.g., cell (3, 1) = 150
-    puts $sdc_file "create_clock -name $clock_name -period $clock_period \\"
-    puts $sdc_file "    -waveform \[list 0 $high_time\] \[get_ports $clock_name\]"
-    incr i
-}
+constraints search rect 0 0 10 3 early_rise_delay
 ```
-> `period {0 750}` → clock is HIGH from 0 to 750 ps, LOW from 750 to 1500 ps = **50% duty cycle**.  
-> `\[` and `\]` are used for literal brackets in SDC output — TCL would otherwise try to evaluate `[...]` as a command.
----
-3.4 Processing Input Constraints & Bus Detection
+
+Searches the specified matrix region and returns the location of:
+
+```text
+early_rise_delay
+```
+
+### Reading Cell Values
+
 ```tcl
-# For n-bit buses, append '*'
-set i $input_start
-while {$i < $output_start} {
-    set port_name [constraints get cell 0 $i]
-
-    # Remove spaces, count elements
-    set count [llength [split [regsub -all {\s+} $port_name ""] ""]]
-
-    if {$count > 2} {
-        # Declare as bus with wildcard: dbg_i2c_adr*
-        append port_name "*"
-    }
-    # else keep as-is: cpu_en
-
-    puts $sdc_file "set_input_delay ... \[get_ports $port_name\]"
-    incr i
-}
+constraints get cell $clock_early_rise_delay_start $i
 ```
-> First remove spaces, then take the count of elements.  
-> If `$count > 2` → declare it as a bus and put `*` → `dbg_i2c_adr*`  
-> Else keep the port as-is → `cpu_en`
----
-3.5 Globbing & Verilog Netlist Parsing
-> **Globbing** is the process of identifying wildcards/patterns in a directory.
+
+Used to extract timing parameters from CSV.
+
+### Generating SDC Constraints
+
+Example generated output:
+
 ```tcl
-# Find all .v files in $NetlistDirectory
-set netlist_files [glob -dir $NetlistDirectory *.v]
-# $netlist_files now contains all .v files present
+set_clock_latency -source -early -rise 150 [get_clocks dco_clk]
 
-# Parse Verilog files to extract input port names
-set tmp_file [open /tmp/1 w]   # create temp file in write mode
-
-foreach file $netlist_files {
-    set fh [open $file r]
-    while {[gets $fh line] != -1} {
-        if {[regexp {^\s*input\s+(.*)} $line match portdecl]} {
-            # regsub -all {\s+} $s1 "" → replace all whitespace with nothing
-            set clean [regsub -all {\s+} $portdecl ""]
-            puts $tmp_file $clean
-        }
-    }
-    close $fh
-}
-close $tmp_file
+set_clock_latency -source -late -fall 153 [get_clocks dco_clk]
 ```
-> This TCL snippet **parses Verilog netlist files** and extracts **input port names** into a temporary file.  
-> `[regsub -all {\s+} $s1 ""]` — replaces all empty white spaces with nothing (string cleanup).
+
+### Clock Creation
+
+```tcl
+create_clock \
+-name dco_clk \
+-period 1500 \
+-waveform {0 750} \
+[get_ports dco_clk]
+```
+
+### Duty Cycle Calculation
+
+For:
+
+```text
+Period = 1500ps
+Duty Cycle = 50%
+```
+
+Waveform becomes:
+
+```text
+{0 750}
+```
+
+### Processing Input Ports
+
+The script automatically detects:
+
+* Scalar inputs
+* Bus inputs
+
+Example:
+
+```verilog
+input [6:0] dbg_i2c_addr;
+```
+
+Converted to:
+
+```tcl
+dbg_i2c_addr*
+```
+
+for wildcard matching.
+
+### Verilog Parsing
+
+Using:
+
+```tcl
+glob -dir $NetlistDirectory *.v
+```
+
+The script:
+
+* Finds all Verilog files.
+* Reads line-by-line.
+* Extracts input declarations.
+* Generates SDC constraints.
+
+### Cleaning Strings
+
+```tcl
+regsub -all {\s+} $s1 ""
+```
+
+Removes all whitespace characters.
+
+## Key Learnings
+
+* Constraint matrix searching.
+* Automatic SDC generation.
+* Clock modeling.
+* Bus handling.
+* Verilog parsing using TCL.
+
+## Screenshots
+
+### Constraint Matrix Search
+
+![Day3-Constraint Search](images/day3_constraint_search.png)
+
+### Generated SDC Constraints
+
+![Day3-SDC](images/day3_sdc_generation.png)
+
+### Processing Input Ports
+
+![Day3-Input Constraints](images/day3_input_constraints.png)
+
 ---
-📸 Screenshots — Day 3
-> *Screenshot 1: Constraints CSV — clock at row 0, input at row 4, output at row 27, with delay columns*
-> *Screenshot 2: Generated `.sdc` file — `create_clock` with `waveform {0 750}`, `set_input_delay` entries*
-> *Screenshot 3: Bus detection output — `dbg_i2c_adr*` vs single-bit `cpu_en`*
-> *Screenshot 4: `/tmp/1` temp file — extracted and cleaned input port names from Verilog*
----
-📅 Day 4 — Yosys Synthesis & Hierarchy Checking
-Objective
-Automate Yosys synthesis runs via TCL, understand gate-level netlist generation, implement hierarchy checking to validate all sub-modules exist, and build robust error handling.
----
-4.1 Yosys Gate-Level Synthesis
-Running the `memory.ys` file in Yosys converts the Verilog file `memory.v` into a gate-level netlist.
-```bash
-# memory.ys synthesis script
+
+# Day 4 – RTL Synthesis Using Yosys
+
+## Objectives
+
+* Synthesizing Verilog designs.
+* Generating gate-level netlists.
+* Understanding logic optimization.
+
+## Topics Covered
+
+### Example Design
+
+```verilog
+module memory(
+    CLK,
+    ADDR,
+    DIN,
+    DOUT
+);
+```
+
+### Yosys Synthesis Script
+
+```yosys
+read_liberty osu018_stdcells.lib
+
 read_verilog memory.v
+
 synth -top memory
+
+dfflibmap -liberty osu018_stdcells.lib
+
+abc -liberty osu018_stdcells.lib
+
+flatten
+
+clean
+
 write_verilog memory_synth.v
 ```
-The resulting netlist contains primitives such as:
-`INV` — Inverters
-`NAND` — NAND gates
-`NOR` — NOR gates
-`OAI` — Or-And-Inverter
-`AOI` — And-Or-Inverter
+
+### Running Yosys
+
+```bash
+yosys memory.ys
+```
+
+### Generated Output
+
+The RTL design is transformed into:
+
+* NAND gates
+* NOR gates
+* AOI gates
+* OAI gates
+* Flip-flops
+
+### Logic Optimization
+
+Yosys performs:
+
+* Constant propagation
+* Dead code removal
+* Logic simplification
+* Technology mapping
+
+## Key Learnings
+
+* RTL synthesis flow.
+* Standard cell mapping.
+* Gate-level netlist generation.
+* Optimization passes in Yosys.
+
+## Screenshots
+
+### Memory Module
+
+![Day4-Memory Module](images/day4_memory_module.png)
+
+### Yosys Script
+
+![Day4-Yosys Script](images/day4_yosys_script.png)
+
+### Synthesis Log
+
+![Day4-Synthesis Log](images/day4_synthesis_log.png)
+
+### Gate-Level Netlist
+
+![Day4-Gate-Level Netlist](images/day4_gate_level_netlist.png)
+
 ---
-4.2 Why Hierarchy Checking?
-In Verilog, a top module often instantiates lower-level modules:
+
+# Day 5 – Hierarchy Checking and Error Handling
+
+## Objectives
+
+* Detecting missing modules.
+* Performing hierarchy verification.
+* Improving synthesis robustness.
+
+## Topics Covered
+
+### Why Hierarchy Checking?
+
+Consider:
+
 ```verilog
 module top();
-  alu    u1();    // needs alu.v
-  memory u2();    // needs memory.v
+
+alu u1();
+
+memory u2();
+
 endmodule
 ```
-Yosys must confirm all sub-modules exist before synthesis begins. Hierarchy check catches:
-❌ Missing module files
-❌ Typos in module names
-❌ Incomplete design hand-off
-> **Fail fast:** Why run optimization/mapping if hierarchy is already broken? Prevent wasting synthesis time.
----
-4.3 Hierarchy Check Implementation
-```tcl
-set my_err 0
-set hier_log [open $OutputDir/$DesignName.hierarchy_check.log w]
 
-foreach module_name $module_list {
-    # file normalize → converts path to full absolute standard form
-    # Expands ~, resolves ./ and ../, gives exact file location
-    set vfile [file normalize $NetlistDirectory/$module_name.v]
+Before synthesis, Yosys must verify:
 
-    if {![file exists $vfile]} {
-        puts $hier_log "Error: Module '$module_name' not found at $vfile"
-        set my_err 1
-    } else {
-        puts $hier_log "OK: $module_name"
-    }
-}
-close $hier_log
+* Does `alu` exist?
+* Does `memory` exist?
+* Are all modules available?
+* Is hierarchy complete?
 
-# Loop begins if (my_err) — only goes to else if no errors
-if {$my_err} {
-    puts "ERROR: Hierarchy check FAILED. See $DesignName.hierarchy_check.log"
-    exit 1
-} else {
-    puts "Hierarchy check PASSED."
-}
-```
-To inspect the log:
-```bash
-vim outdir_openMSP430/openMSP430.hierarchy_check.log
-```
-> In the given error detection script — `if` loop shows presence of any errors.  
-> Only if there are **no errors** does it go to the `else` which puts "hierarchy check pass".  
-> `lindex 0` = error type, `lindex 2` = error module name.
----
-4.4 Running Yosys via `exec`
-```tcl
-# exec → run Unix shell commands from TCL script
-# >& → redirect stdout AND stderr to log file
-exec yosys $OutputDir/$DesignName.ys >& $OutputDir/$DesignName.synthesis.log
-```
-> `exec` is used to run Unix shell commands from the TCL script.  
-> `>&` redirects output to `$outputdir`.  
-> If `err_flag` is zero → all modules found → in the log all files are executing correctly.
----
-4.5 Error Handling Flow
-```
-  ┌─────────────────────────┐
-  │   Start Synthesis Flow  │
-  └────────────┬────────────┘
-               │
-  ┌────────────▼────────────┐
-  │   Hierarchy Check       │
-  │   (check all .v exist)  │
-  └────────────┬────────────┘
-               │
-       ┌───────┴────────┐
-    FAIL                PASS
-       │                │
-  ┌────▼────┐    ┌───────▼──────────┐
-  │ Print   │    │ Create .ys script│
-  │ Error   │    │ Run Yosys (exec) │
-  │ exit 1  │    └───────┬──────────┘
-  └─────────┘            │
-               ┌─────────▼──────────┐
-               │  Check synth log   │
-               └─────────┬──────────┘
-                         │
-                ┌────────┴─────────┐
-              ERROR             SUCCESS
-                │                 │
-          Print error        Proceed to
-          exit 1             post-processing
-```
----
-📸 Screenshots — Day 4
-> *Screenshot 1: Yosys gate-level netlist output — showing INV, NAND, NOR, OAI, AOI cell instances*
-> *Screenshot 2: Hierarchy check log (pass) — all modules found, final "PASSED" message*
-> *Screenshot 3: Hierarchy check log (error) — missing module with full normalized path*
-> *Screenshot 4: TCL script with `if {$my_err}` error handling block and `exec yosys` command*
----
-📅 Day 5 — OpenTimer STA & Report Generation
-Objective
-Complete the full automation flow by invoking OpenTimer for STA, using `proc` for reusable code, reading SDC/SPEF into the timing tool, and generating a formatted summary report with WNS, FEP, and instance count metrics.
----
-5.1 Yosys Netlist Post-Processing
-Before feeding the netlist to a timing tool, clean up special characters from Yosys output (`/`, `$`):
-```tcl
-# Script to edit Yosys output netlist — remove extra / and $ characters
-set fh [open $OutputDir/$DesignName.synth.v r]
-set content [read $fh]
-close $fh
+### Error Handling
 
-set cleaned [regsub -all {/}    $content ""]
-set cleaned [regsub -all {\\\$} $cleaned ""]
+Without error handling:
 
-set out [open $OutputDir/$DesignName.final.v w]
-puts $out $cleaned
-close $out
-```
-> Here we have: hierarchy check → main synthesis script (`.ys`) → log file → final `synth.v`.  
-> Script works and has removed all the `/` characters.
----
-5.2 TCL `proc` — Reusable Procedures
-> In TCL, `proc` is used to **define a procedure (function)**. It groups commands together and allows calling them whenever needed.
-```tcl
-# Define in external procs.tcl file
-proc read_lib {args} {
-    # Supports three switches: -late, -early, -help
-    array set opts {-late "" -early "" -help 0}
-    array set opts $args
+* Scripts may crash.
+* Logs become difficult to debug.
+* Partial outputs may be generated.
 
-    if {$opts(-help)} {
-        puts "Usage: read_lib -late <lib> or -early <lib>"
-        return
-    }
-    if {$opts(-late)  ne ""} { puts "set_late_celllib  $opts(-late)"  }
-    if {$opts(-early) ne ""} { puts "set_early_celllib $opts(-early)" }
-}
-```
-> Pass arguments in main TCL file → sends to external TCL file → does computation → returns outputs.  
-> **Write once, call multiple times.**  
-> All data gets dumped in the `.conf` file because of the `puts` command.
----
-5.3 OpenTimer — STA Tool
-> **OpenTimer** is an open-source STA (Static Timing Analysis) tool used to perform setup and hold violation checks.
-Generated `.conf` file:
-```
-read_netlist   openMSP430.final.v
-read_celllib   -late  sky130_fd_sc_hd__tt_025C_1v80.lib
-read_celllib   -early sky130_fd_sc_hd__ff_100C_1v65.lib
-read_spef      openMSP430.spef
-read_sdc       openMSP430.sdc
-report_timing
-exit
-```
-Opening `outdir_openMSP430/openMSP430.spef` and `.conf` confirms all files are linked correctly.
----
-5.4 `read_sdc` proc — SDC to OpenTimer Format
-```tcl
-# TASK — read_sdc proc
-# Take the SDC file and convert it into OpenTimer format
-proc read_sdc {sdc_file} {
-    set fh [open $sdc_file r]
-    set conf ""
+### Running Shell Commands from TCL
 
-    while {[gets $fh line] != -1} {
-        # Convert create_clock
-        if {[regexp {create_clock.*-period\s+(\S+).*get_ports\s+(\S+)} $line -> period port]} {
-            append conf "clock $port $period\n"
-        }
-        # Convert set_input_delay
-        if {[regexp {set_input_delay\s+(\S+).*get_ports\s+(\S+)} $line -> delay port]} {
-            append conf "at $port $delay\n"
-        }
-    }
-    close $fh
-    return $conf
-}
-```
----
-5.5 Common EDA Multi-Threading Commands
-> These are common commands available in most EDA tools for multi-threading, multi-CPU options, analysing distributed timing, routing etc.  
-> Internally they are converted into commands understood by the OpenTimer tool.
 ```tcl
-set_num_threads 4
-set_num_cpus    2
-analyze_distributed_timing
+exec yosys $OutputDirectory/$DesignName.hier.ys
 ```
-These get dumped to the `.conf` file via:
-```tcl
-# Dumping code in test.tcl — all data goes to .conf
-puts $conf_file "set_num_threads $num_threads"
-```
----
-5.6 Generating the Output Report
-> Generation of the output report is very important for STA.  
-> Done by placing values in the right format by `grep`ing details from the existing result files.
-Key metrics extracted:
-Metric	Full Form	How Extracted
-`WNS`	Worst Negative Slack	Grep for keyword `RAT` in `.results`, pick the worst (most negative) value
-`FEP`	Failing End Points	Total count of `RAT` entries in the results file
-`WNS setup`	Worst setup violation	`grep` with `set pattern {setup}`
-`FEP setup`	Setup failing endpoints	Count of setup RAT entries
-`WNS hold`	Worst hold violation	`grep` with `set pattern {hold}`
-`FEP hold`	Hold failing endpoints	Count of hold RAT entries
-Instance Count	Total std-cell instances	More instances = larger area
-Runtime	Execution time (sec)	`[clock seconds]` divide to get seconds
----
-WNS Extraction:
-```tcl
-# WNS = worst negative slack
-# Found by grepping for keyword RAT in .results
-# Out of many RATs, we print the worst (highest negative) value
-set result_fh [open $OutputDir/$DesignName.results r]
-set wns 0
 
-while {[gets $result_fh line] != -1} {
-    if {[regexp {RAT\s+(\S+)} $line -> slack]} {
-        if {$slack < $wns} { set wns $slack }
-    }
-}
-puts "WNS = $wns"
-```
-FEP Extraction:
-```tcl
-# FEP = Failing End Points
-# There are multiple RATs — total number of RATs is the FEP
-set fep [regexp -all {RAT} [read $result_fh]]
-puts "FEP = $fep"
-```
-For setup and hold — same script, only pattern changes:
-```tcl
-# FEP setup, WNS setup
-set pattern {setup}
+### Redirecting Logs
 
-# FEP hold, WNS hold
-set pattern {hold}
-```
-Runtime:
 ```tcl
-set start_time [clock seconds]
-# ... entire flow ...
-set end_time [clock seconds]
-# Divide to get value in seconds
+>&
+```
+
+Used to redirect output into log files.
+
+### Hierarchy Status
+
+#### PASS
+
+```text
+err flag = 0
+```
+
+All modules found successfully.
+
+#### FAIL
+
+```text
+err flag = 1
+```
+
+Missing module detected.
+
+### Advantages
+
+* Faster debugging.
+* Early failure detection.
+* Cleaner synthesis flow.
+* Improved automation.
+
+## Key Learnings
+
+* Hierarchy validation.
+* Error handling in TCL.
+* TCL `exec` command.
+* Log generation and parsing.
+* Building reliable synthesis scripts.
+
+## Screenshots
+
+### Hierarchy Check Concept
+
+![Day5-Hierarchy Check](images/day5_hierarchy_check.png)
+
+### Error Flag Detection
+
+![Day5-Error Handling](images/day5_error_handling.png)
+
+### Successful Hierarchy Verification
+
+![Day5-Hierarchy Pass](images/day5_hierarchy_pass.png)
+
+---
+
+# Conclusion
+
+Over these five days, I developed a strong understanding of **TCL scripting for EDA automation**, including:
+
+✅ TCL fundamentals and scripting
+✅ CSV parsing and matrix handling
+✅ Automatic SDC generation
+✅ Verilog netlist parsing
+✅ Yosys synthesis automation
+✅ Gate-level netlist generation
+✅ Hierarchy verification and error handling
+
+This project demonstrates how TCL can be used to build a complete automation flow for RTL synthesis and timing constraint generation in VLSI design environments.
+
+---
+
+## Acknowledgements
+
+* VLSI System Design (VSD)
+* Yosys Open Source Synthesis Suite
+* TCL/Tk Community
+* OpenMSP430 Design Example
+
+*Based on notes and exercises completed during the TCL Scripting VSD workshop.* 
+
+
+
+
+
+
+
 set runtime  [expr {($end_time - $start_time) / 1.0}]
 puts "Runtime: $runtime sec"
 ```
