@@ -1,0 +1,13 @@
+read_liberty -lib -ignore_miss_dir -setattr blackbox osu018_stdcells.lib
+read_verilog memory.v
+
+synth -top memory
+splitnets -ports -format __
+dfflibmap -liberty osu018_stdcells.lib
+opt
+abc -liberty osu018_stdcells.lib
+flatten
+clean -purge
+opt
+clean
+write_verilog memory_synth.v
