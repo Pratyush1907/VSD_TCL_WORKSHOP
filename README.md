@@ -3,7 +3,7 @@
 
 ## Overview
 
-This repository documents my **5-day TCL Scripting for VLSI System Design (VSD)** learning journey. During this workshop, I learned how TCL scripting can be used to automate synthesis flows, process CSV constraint files, generate SDC constraints, perform hierarchy checking, handle errors, and automate Yosys-based RTL synthesis.
+This repository documents my  TCL Scripting for VLSI System Design (VSD) learning journey. During this workshop, I learned how TCL scripting can be used to automate synthesis flows, process CSV constraint files, generate SDC constraints, perform hierarchy checking, handle errors, and automate Yosys-based RTL synthesis.
 
 The project culminates in building a TCL-based synthesis framework (**vsdsynth**) that:
 
