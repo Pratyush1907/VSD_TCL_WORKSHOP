@@ -1,4 +1,4 @@
-# VSD_TCL_WORKSHOP
+# VSD TCL WORKSHOP
 
 ## Overview
 
@@ -550,67 +550,6 @@ This project demonstrates how TCL can be used to build a complete automation flo
 
 
 
-set runtime  [expr {($end_time - $start_time) / 1.0}]
-puts "Runtime: $runtime sec"
-```
----
-5.7 Final Report Format
-```
-*****************************************************
-*        TCL Workshop — Timing Summary Report       *
-*****************************************************
-
-Design Name    : openMSP430
-Runtime        : 143 sec
-
-------------- Setup Timing --------------------------
-WNS (setup)    : -0.32 ns
-FEP (setup)    : 14
-
-------------- Hold Timing ---------------------------
-WNS (hold)     : -0.08 ns
-FEP (hold)     : 3
-
-------------- Area ----------------------------------
-Instance Count : 2847
-(More instances = larger area)
-
-*****************************************************
-```
-> This is one of the commonly used formats for STA reports.
----
-📸 Screenshots — Day 5
-> *Screenshot 1: Netlist before/after cleanup — Yosys output with `/` characters removed*
-> *Screenshot 2: `openMSP430.conf` — all `read_*` commands and `report_timing`*
-> *Screenshot 3: `openMSP430.spef` — first few lines of the parasitic file*
-> *Screenshot 4: `procs.tcl` — `read_lib` and `read_sdc` procedure definitions with switch handling*
-> *Screenshot 5: Final terminal output showing the formatted timing summary report*
----
-🛠️ Tools & Technologies
-Tool / Technology	Role
-Bash / Shell	Entry point, environment setup, argument validation
-TCL (Tool Command Language)	Core automation scripting
-Yosys	Open-source RTL synthesis framework
-OpenTimer	Open-source Static Timing Analysis (STA) tool
-SDC format	Synopsys Design Constraints — timing definition
-SPEF format	Standard Parasitic Exchange Format — RC parasitics
-struct::matrix	TCL package for 2D matrix data structures
-csv	TCL package for CSV file parsing
----
-💡 Key Learnings
-`chmod +x` + `./` — the entry point to any Linux script automation flow
-`lindex $argv 0` — the standard way to receive file paths from shell into TCL
-`struct::matrix` + `csv::read2matrix` — clean pattern for reading design data from CSVs
-`string map` — essential for sanitizing names before using them as variable identifiers
-`constraints search rect` — powerful for locating section boundaries in a constraint matrix
-`\[` and `\]` — must escape TCL's special `[]` when writing SDC/conf output files
-`file normalize` — always use for error messages so users see the full expected path
-`exec ... >& logfile` — the standard TCL pattern for running EDA tools and capturing all output
-`proc` — write once, call many times; essential for scalable automation scripts
-WNS is found from RAT — grep keyword in timing results, pick the most negative value
-FEP = count of RAT entries — total failing endpoints is simply the total number of RAT lines
-Instance count ∝ area — more standard cell instances in the netlist = larger chip area
----
 <div align="center">
 Workshop by VSD — VLSI System Design
 </div>
