@@ -1,5 +1,4 @@
 # VSD_TCL_WORKSHOP
-# TCL Scripting for VSD Synthesis Flow
 
 ## Overview
 
