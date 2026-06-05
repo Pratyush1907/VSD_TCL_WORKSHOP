@@ -69,13 +69,13 @@ The script checks whether the required CSV file exists before continuing executi
 
 ## Screenshots
 
-### Tool Initialization
+<img width="1093" height="456" alt="image" src="https://github.com/user-attachments/assets/9257908c-ab96-48cc-b103-0d6eebd159fd" />
+<img width="1093" height="516" alt="image" src="https://github.com/user-attachments/assets/0da63f09-bfb9-41b2-8bda-0e075076a8b7" />
+<img width="1093" height="500" alt="image" src="https://github.com/user-attachments/assets/5c48d637-93e2-449f-ada1-c31a41473cfc" />
+<img width="1014" height="513" alt="image" src="https://github.com/user-attachments/assets/b696728d-16d3-4a2a-977f-3d703ba59440" />
+<img width="1093" height="491" alt="image" src="https://github.com/user-attachments/assets/5fb8f8bc-ebaf-456d-abc1-0b3a2512ca84" />
 
-![Day1-Tool Initialization](images/day1_tool_initialization.png)
 
-### Missing CSV File Detection
-
-![Day1-CSV Error](images/day1_csv_error.png)
 
 ---
 
@@ -186,17 +186,13 @@ before synthesis begins.
 
 ## Screenshots
 
-### CSV File Parsing
+<img width="1093" height="497" alt="image" src="https://github.com/user-attachments/assets/7c3bb53d-4d02-4180-b685-d0362cef1a80" />
+<img width="1093" height="564" alt="image" src="https://github.com/user-attachments/assets/6a4e545e-5a68-4e20-9f12-e02daa5fad9e" />
+<img width="1070" height="56" alt="image" src="https://github.com/user-attachments/assets/067c734c-2856-48ba-989f-3a3e57f63fef" />
+<img width="1093" height="190" alt="image" src="https://github.com/user-attachments/assets/667bff1a-7765-4d77-9629-f5d2c991324e" />
+<img width="1093" height="330" alt="image" src="https://github.com/user-attachments/assets/5b954e43-fade-43ec-ad61-e4d49040e789" />
+<img width="866" height="338" alt="image" src="https://github.com/user-attachments/assets/6a04f409-4bcc-4af8-8c6c-244c85e6ea10" />
 
-![Day2-CSV Parsing](images/day2_csv_parsing.png)
-
-### Matrix Creation and Array Linking
-
-![Day2-Matrix](images/day2_matrix_creation.png)
-
-### Directory Validation
-
-![Day2-Directory Check](images/day2_directory_validation.png)
 
 ---
 
@@ -331,17 +327,8 @@ Removes all whitespace characters.
 
 ## Screenshots
 
-### Constraint Matrix Search
-
-![Day3-Constraint Search](images/day3_constraint_search.png)
-
-### Generated SDC Constraints
-
-![Day3-SDC](images/day3_sdc_generation.png)
-
-### Processing Input Ports
-
-![Day3-Input Constraints](images/day3_input_constraints.png)
+<img width="1093" height="771" alt="image" src="https://github.com/user-attachments/assets/e3565306-3847-4f22-8f73-c0f9283760f9" />
+<img width="1093" height="857" alt="image" src="https://github.com/user-attachments/assets/df935c00-64e4-4dc8-a5f6-f9aa48fa964e" />
 
 ---
 
@@ -420,23 +407,19 @@ Yosys performs:
 
 ## Screenshots
 
-### Memory Module
+<img width="895" height="644" alt="image" src="https://github.com/user-attachments/assets/3dd472fa-f5cd-4d04-9324-a49cc6476185" />
+<img width="1093" height="478" alt="image" src="https://github.com/user-attachments/assets/0f1a7837-364a-47dc-97a8-79ef542070d2" />
+<img width="1006" height="1170" alt="image" src="https://github.com/user-attachments/assets/8797b328-1f96-48b1-b8a4-2b9f5e00aebe" />
+<img width="1093" height="509" alt="image" src="https://github.com/user-attachments/assets/baaa597f-1752-4a8a-a4b8-c5f3f12cafd2" />
+<img width="1080" height="1147" alt="image" src="https://github.com/user-attachments/assets/6798d1e8-03e7-4a55-8f9e-8595f4775482" />
+<img width="1093" height="479" alt="image" src="https://github.com/user-attachments/assets/5d166eae-8753-4f2a-82c2-998c73a1e2e6" />
+<img width="974" height="606" alt="image" src="https://github.com/user-attachments/assets/1f5fbdae-66c2-4b98-b717-c57bbc9dbd4b" />
+<img width="1093" height="590" alt="image" src="https://github.com/user-attachments/assets/a444dce8-933f-45fd-bce4-9f07d5eff74c" />
+<img width="1006" height="202" alt="image" src="https://github.com/user-attachments/assets/e2a904df-ddbe-451e-8db2-4496683d39a0" />
+<img width="1093" height="173" alt="image" src="https://github.com/user-attachments/assets/4915b6ac-0060-4387-a1c5-ce7620b52883" />
+<img width="1093" height="221" alt="image" src="https://github.com/user-attachments/assets/21c0b6d9-e946-4da4-a253-d383a7aec429" />
+<img width="1093" height="44" alt="image" src="https://github.com/user-attachments/assets/8644e3a3-28da-4406-9cd3-f081c327cd36" />
 
-![Day4-Memory Module](images/day4_memory_module.png)
-
-### Yosys Script
-
-![Day4-Yosys Script](images/day4_yosys_script.png)
-
-### Synthesis Log
-
-![Day4-Synthesis Log](images/day4_synthesis_log.png)
-
-### Gate-Level Netlist
-
-![Day4-Gate-Level Netlist](images/day4_gate_level_netlist.png)
-
----
 
 # Day 5 – Hierarchy Checking and Error Handling
 
@@ -526,35 +509,33 @@ Missing module detected.
 
 ## Screenshots
 
-### Hierarchy Check Concept
-
-![Day5-Hierarchy Check](images/day5_hierarchy_check.png)
-
-### Error Flag Detection
-
-![Day5-Error Handling](images/day5_error_handling.png)
-
-### Successful Hierarchy Verification
-
-![Day5-Hierarchy Pass](images/day5_hierarchy_pass.png)
-
----
+<img width="1093" height="311" alt="image" src="https://github.com/user-attachments/assets/10a6b8cf-6a28-42b5-85d5-a7b76c639f99" />
+<img width="1093" height="653" alt="image" src="https://github.com/user-attachments/assets/54d71dbb-df98-4572-b6d3-1d7b576102ce" />
+<img width="1093" height="378" alt="image" src="https://github.com/user-attachments/assets/152af1be-da44-492d-9224-f12b6a68dae6" />
+<img width="874" height="120" alt="image" src="https://github.com/user-attachments/assets/97f1f04f-8e2d-4903-a281-ecba9d769d62" />
+<img width="831" height="358" alt="image" src="https://github.com/user-attachments/assets/e2716d56-243c-4957-b581-c0ba042654ca" />
+<img width="1093" height="319" alt="image" src="https://github.com/user-attachments/assets/615d55b1-dd6a-49da-922d-fba1c251fb08" />
+<img width="1093" height="204" alt="image" src="https://github.com/user-attachments/assets/59ea3564-b551-4eb4-b3d4-817673a368ba" />
+<img width="919" height="311" alt="image" src="https://github.com/user-attachments/assets/37868b12-7763-414c-b2f1-ab0de9a22500" />
+<img width="1093" height="133" alt="image" src="https://github.com/user-attachments/assets/53a22e4a-0c92-49db-8640-1f1dc12eb744" />
+<img width="949" height="1117" alt="image" src="https://github.com/user-attachments/assets/c1c5910f-3455-40da-9812-48dee1be63c8" />
+<img width="1093" height="389" alt="image" src="https://github.com/user-attachments/assets/9a0eaa68-5ab6-45ee-8e0f-b631b3e92deb" />
 
 # Conclusion
 
 Over these five days, I developed a strong understanding of **TCL scripting for EDA automation**, including:
 
-✅ TCL fundamentals and scripting
-✅ CSV parsing and matrix handling
-✅ Automatic SDC generation
-✅ Verilog netlist parsing
-✅ Yosys synthesis automation
-✅ Gate-level netlist generation
-✅ Hierarchy verification and error handling
+ TCL fundamentals and scripting
+ CSV parsing and matrix handling
+ Automatic SDC generation
+ Verilog netlist parsing
+ Yosys synthesis automation
+ Gate-level netlist generation
+ Hierarchy verification and error handling
 
 This project demonstrates how TCL can be used to build a complete automation flow for RTL synthesis and timing constraint generation in VLSI design environments.
 
----
+
 
 ## Acknowledgements
 
@@ -563,7 +544,6 @@ This project demonstrates how TCL can be used to build a complete automation flo
 * TCL/Tk Community
 * OpenMSP430 Design Example
 
-*Based on notes and exercises completed during the TCL Scripting VSD workshop.* 
 
 
 
